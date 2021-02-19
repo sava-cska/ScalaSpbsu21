@@ -20,15 +20,12 @@ sealed trait IntList {
 case object IntList {
   def undef: Nothing = throw new UnsupportedOperationException("operation is undefined")
 
-  def fromSeq(seq: Seq[Int]): IntList = {
-    if (seq.isEmpty) IntNil
-    else IntCons(seq.head, fromSeq(seq.drop(1)))
-  }
+  def fromSeq(seq: Seq[Int]): IntList = seq.foldRight[IntList](IntNil) { (x, list) => IntCons(x, list) }
 
   def sum(intList: IntList): Int = {
     intList match {
       case IntNil => undef
-      case _ => foldLeft(intList, 0){_ + _}
+      case _ => foldLeft(intList, 0) {_ + _}
     }
   }
 
@@ -55,13 +52,17 @@ case object IntNil extends IntList {
   override def tail: IntList = IntNil
 
   override def drop(n: Int): IntList = {
-    if (n == 0) IntNil
-    else undef
+    n match {
+      case 0 => IntNil
+      case _ => undef
+    }
   }
 
   override def take(n: Int): IntList = {
-    if (n == 0) IntNil
-    else undef
+    n match {
+      case 0 => IntNil
+      case _ => undef
+    }
   }
 
   override def map(f: Int => Int): IntList = IntNil
@@ -73,13 +74,17 @@ case class IntCons(x: Int, list: IntList) extends IntList {
   override def tail: IntList = list
 
   override def drop(n: Int): IntList = {
-    if (n == 0) this
-    else list.drop(n - 1)
+    n match {
+      case 0 => this
+      case _ => list.drop(n - 1)
+    }
   }
 
   override def take(n: Int): IntList = {
-    if (n == 0) IntNil
-    else IntCons(x, list.take(n - 1))
+    n match {
+      case 0 => IntNil
+      case _ => IntCons(x, list.take(n - 1))
+    }
   }
 
   override def map(f: Int => Int): IntList = IntCons(f(x), list.map(f))
