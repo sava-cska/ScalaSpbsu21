@@ -1,7 +1,7 @@
 package org.spbsu.mkn.scala
 
 import org.scalatest.funsuite.AnyFunSuite
-import org.spbsu.mkn.scala.MyGenericList.{fromSeq, size, sum}
+import org.spbsu.mkn.scala.MyGenericList.{fromSeq, size, sort, sum}
 
 class MyGenericListTest extends AnyFunSuite {
 
@@ -34,7 +34,9 @@ class MyGenericListTest extends AnyFunSuite {
     val name: String
     final val age = 1
   }
+
   case class Cat(override val name: String) extends Animal
+
   case class Dog(override val name: String) extends Animal
 
   test("map") {
@@ -56,7 +58,14 @@ class MyGenericListTest extends AnyFunSuite {
     assertThrows[UnsupportedOperationException](sum[Int](MyNil))
     assert(sum(fromSeq(Seq(1, 2, 3))) == 6)
     assert(sum(fromSeq(Seq(1))) == 1)
-
     assert(sum(fromSeq(Seq(' ', '0'))) == 'P')
+  }
+
+  test("sort") {
+    assert(sort(fromSeq(Seq(3, 2, 1))) == fromSeq(Seq(1, 2, 3)))
+    assert(sort(fromSeq(Seq(5, 7, 1, 5, 3, 2, 1, 1, 4))) == fromSeq(Seq(1, 1, 1, 2, 3, 4, 5, 5, 7)))
+    assert(sort(fromSeq(Seq("baba", "a", "ab", "baa"))) == fromSeq(Seq("a", "ab", "baa", "baba")))
+    assert(sort(fromSeq(Seq('p', 'z', 'a', 'k'))) == fromSeq(Seq('a', 'k', 'p', 'z')))
+    assert(sort(fromSeq(Seq(5.0, 7.122, -6.83, -6.82))) == fromSeq(Seq(-6.83, -6.82, 5.0, 7.122)))
   }
 }

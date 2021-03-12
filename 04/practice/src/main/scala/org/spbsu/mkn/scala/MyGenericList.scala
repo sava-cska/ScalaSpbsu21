@@ -1,8 +1,6 @@
 package org.spbsu.mkn.scala
 
 import org.spbsu.mkn.scala.MyGenericList._
-
-import java.util.Comparator
 import scala.annotation.tailrec
 
 sealed trait MyGenericList[+T] {
@@ -46,7 +44,31 @@ case object MyGenericList {
     }
   }
 
-  def sort[T](list: MyGenericList[T])(implicit comparator: Comparator[T]): MyGenericList[T] = ???
+  @tailrec
+  def checkSorted[T](myList: MyGenericList[T])(implicit comparator: Ordering[T]): Boolean = {
+    myList match {
+      case MyNil => true
+      case MyCons(_, MyNil) => true
+      case MyCons(x, list@MyCons(y, _)) => (comparator.compare(x, y) <= 0) && checkSorted[T](list)
+    }
+  }
+
+  def swapMaxRight[T](myList: MyGenericList[T])(implicit comparator: Ordering[T]): MyGenericList[T] = {
+    myList match {
+      case MyNil => myList
+      case MyCons(_, MyNil) => myList
+      case MyCons(x, list@MyCons(y, _)) if comparator.compare(x, y) <= 0 => MyCons(x, swapMaxRight(list: MyGenericList[T]))
+      case MyCons(x, MyCons(y, list)) if comparator.compare(x, y) > 0 => MyCons(y, swapMaxRight(MyCons(x, list)))
+    }
+  }
+
+  def sort[T](myList: MyGenericList[T])(implicit comparator: Ordering[T]): MyGenericList[T] = {
+    var list = myList
+    while (!checkSorted(list)) {
+      list = swapMaxRight(list)
+    }
+    list
+  }
 }
 
 case object MyNil extends MyGenericList[Nothing] {
